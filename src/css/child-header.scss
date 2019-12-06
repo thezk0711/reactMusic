@@ -1,0 +1,28 @@
+
+header.child-header{
+    padding: 0;
+    position: relative;
+    justify-content: center; 
+    border-bottom: 1px solid #bebebe;
+    z-index: 999;
+    h3{
+        font-size: .35rem;
+        width: 80%;
+        line-height: 1rem;
+    }
+    span{
+        font-family: 'iconfont';
+        font-size: .45rem;
+        position: absolute;
+        top:50%;
+        left: .25rem;
+        transform: translateY(-50%);
+    }
+}
+header.white{
+    color: #fff;
+    border-bottom: 0;
+    span{
+        color: #fff;
+    }
+}

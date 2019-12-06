@@ -1,0 +1,49 @@
+.search-info-box{
+    width: 100%;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    .search-info-titile{
+        width: 100%;
+        display: flex;
+        align-items: center;
+        font-size: 0.3rem;
+        justify-content: center;
+        height: 1.5rem;
+        li{
+            padding: 0 0.3rem;
+            padding-bottom: 0.3rem;
+            margin-right: 1rem;
+        }
+        li.active{
+            color: #d43c33;
+            border-bottom: 2px solid #d43c33;
+        }
+    }
+    .search-info-musilist{
+        flex: 1;
+        box-sizing: border-box;
+        padding:0 5%;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        li{
+            display: flex;
+            flex-direction: column;
+            margin-bottom:0.35rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid #e5e5e5;
+            span{
+                &:first-child{
+                    font-size: 0.3rem;
+                    color: #333;
+                    margin-bottom: 0.2rem;
+                }
+                &:last-child{
+                    font-size: 0.28rem;
+                    color: #999;
+                }
+            }
+        }
+    }
+}

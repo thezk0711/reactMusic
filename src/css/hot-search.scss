@@ -1,0 +1,26 @@
+.hot-search-list{
+    flex: 1;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    h2{
+        font-size: 0.3rem;
+        color: #666;
+        padding-left:0.2rem;
+        margin-bottom: 0.35rem;
+        margin-top: 0.2rem;
+    }
+    ul{
+        display: flex;
+        padding: 0 0.2rem;
+        box-sizing: border-box;
+        flex-wrap: wrap;
+        li{
+            font-size: 0.28rem;
+            padding: 0.1rem 0.2rem;
+            border: 1px solid #e3e3e3;
+            border-radius: 0.3rem;
+            margin-bottom: 0.25rem;
+            margin-right: 0.2rem;
+        }
+    }
+}

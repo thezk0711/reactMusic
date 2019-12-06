@@ -1,0 +1,65 @@
+.rec-title{
+    font-size: 0.32rem;
+    padding-left:5%;
+    margin-top: 0.3rem;
+}
+.rec-list{
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5%;
+    flex-wrap: wrap;
+    margin: 0.2rem 0;
+    li{
+        width: 30%;
+        margin-bottom: 0.25rem;
+        position: relative;
+        a{
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            img{
+                width: 100%;
+            }
+            h5{
+                font-size: .25rem;
+                word-break: break-all;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                /* autoprefixer:off 解决webpack编译问题*/
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                line-height: .3rem;
+                margin-top:.2rem;
+            }
+            &:after{
+                content: attr(data-play-count);
+                font-size: 0.25rem;
+                font-family: 'iconfont';
+                background: url(../images/player.png) no-repeat left center;
+                background-size: 0.2rem;
+                display: block;
+                position: absolute;
+                top:0.15rem;
+                right: 0.15rem;
+                color: #fff;
+                z-index: 2;
+                padding-left:0.25rem;
+            }
+            &:before{
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1;
+                height: 0.35rem;
+                background: -webkit-gradient(linear,left top,left bottom,color-stop(0,rgba(0,0,0,.35)),color-stop(80%,rgba(0,0,0,.2)),to(transparent));
+                background: -webkit-linear-gradient(top,rgba(0,0,0,.35),rgba(0,0,0,.1) 80%,transparent);
+                background: linear-gradient(180deg,rgba(0,0,0,.35) 0,rgba(0,0,0,.1) 80%,transparent);
+            }
+        }
+    }
+}
