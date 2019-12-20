@@ -7,7 +7,8 @@ const defaultState = {
         isShowHeader: false, // 是否显示子导航栏
         headerTitle: '', // 子导航栏标题
         status: 0 // 子导航栏文字颜色 0黑色 1白色
-    }
+    },
+    musicList: []
 }
 function isShowPlayer(isShowPlayer = defaultState.isShowPlayer,action){
     if(action.type === ActionTypes.SET_SHOW_PLAYER){
@@ -27,9 +28,16 @@ function currentMusic(currentMusic = defaultState.currentMusic,action){
     }
     return currentMusic
 }
+function musicList(musicList = defaultState.musicList,action){
+    if(action.type === ActionTypes.SET_MUSIC_LIST){
+        return action.musicList
+    }
+    return musicList
+}
 const reducer = combineReducers({
     isShowPlayer,
     currentMusic,
-    headerOptions
+    headerOptions,
+    musicList
 })
 export default reducer

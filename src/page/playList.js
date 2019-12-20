@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
-import {setHeaderOptions} from '../store/action'
+import {setHeaderOptions,setShowPlayer,currentMusic,setMusicList} from '../store/action'
 import Ajax from '../api/ajax'
 import '../css/play-list.scss'
 import {formatPlayerCount} from '../common/utils'
@@ -10,6 +10,7 @@ class PlayList extends Component{
         this.state = {
             playlist: {} // 歌单详情
         }
+        this.playNow = this.playNow.bind(this)
     }
     componentWillMount(){
         this.props.setHeaderOptions({
@@ -26,10 +27,31 @@ class PlayList extends Component{
                 headerTitle: '歌单', 
                 status: 1
             })
+            const playList = res.playlist.tracks.map(item=>{
+                item.isPlay = false
+                item.artists = item.ar
+                return item
+            })
+            res.playlist.tracks = playList
             this.setState({
                 playlist: res.playlist
+            },()=>{
+                this.refs.playList.addEventListener('scroll',(e)=>{
+                    if(this.refs.playList.scrollTop >= 80) {
+                        this.props.setHeaderOptions({
+                            isShowHeader: true,
+                            headerTitle: res.playlist.name, 
+                            status: 1
+                        })
+                    } else {
+                        this.props.setHeaderOptions({
+                            isShowHeader: true,
+                            headerTitle: '歌单', 
+                            status: 1
+                        })
+                    }
+                })
             })
-            console.log(res.playlist)
         })
     }
     componentWillUnmount () {
@@ -37,19 +59,15 @@ class PlayList extends Component{
         this.props.setHeaderOptions({
             isShowHeader: false
         })
-        // 卸载异步操作设置状态
-        this.setState = (state, callback) => {
-            return
-        }
     }
     render(){
         return(
-           this.state.playlist.hasOwnProperty('playCount') &&  <div className="play-list-box">
-                <div className="play-list-bg"
+           this.state.playlist.hasOwnProperty('playCount') ? <Fragment><div className="play-list-bg"
                     style={{
-                        backgroundImage:`url(//music.163.com/api/img/blur/${this.state.playlist.coverImgId_str}?param=150y150)`
+                        backgroundImage:`url(${this.state.playlist.coverImgUrl}?param=150y150)`
                     }}>
                 </div>
+                <div className="play-list-box" ref="playList">
                 <section className="play-list-content">
                     <div className="play-list-img" data-play-count={formatPlayerCount(this.state.playlist.playCount)}>
                         <img src={`${this.state.playlist.coverImgUrl}?param=150y150`}  alt="" />
@@ -67,15 +85,15 @@ class PlayList extends Component{
                         {
                             this.state.playlist.tracks.map((item,index) => {
                                 return(
-                                    <li key={item.id}>
+                                    <li key={item.id} onClick={this.playNow.bind(this,index)}>
                                         <section className="play-list-main-l">
                                             {index+1}
                                         </section>
                                         <section className="play-list-main-r">
-                                            <h6>
+                                            <h6 className={item.isPlay ? 'text-overflow player' : 'text-overflow'}>
                                                 {item.name}
                                             </h6>
-                                            <span>
+                                            <span className="text-overflow">
                                                 {`${item.ar.map(item => {
                                                     return item.name
                                                 })} - ${item.name}`}
@@ -88,7 +106,23 @@ class PlayList extends Component{
                     </ul> 
                 </div>
             </div>
+            </Fragment> : <Fragment><div className="play-list-box"></div></Fragment>
         )
+    }
+    playNow(playIndex){
+        let playlist = this.state.playlist
+        playlist.tracks = playlist.tracks.map((item)=>{
+            item.isPlay = false
+            return item
+        })
+        playlist.tracks[playIndex].isPlay = true
+        this.setState({
+            playlist: playlist
+        })
+        this.props.showPlayer()
+        this.props.currentMusic(playlist.tracks[playIndex])
+        let arr=[...playlist.tracks]
+        this.props.setMusicList(arr)
     }
 }
 const mapStateToProps = state => ({
@@ -98,6 +132,15 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     setHeaderOptions: (options) => {
         dispatch(setHeaderOptions(options))
+    },
+    showPlayer: () => {
+        dispatch(setShowPlayer(true))
+    },
+    currentMusic:status=>{
+        dispatch(currentMusic(status))
+    },
+    setMusicList:list=>{
+        dispatch(setMusicList(list))
     }
 })
 export default connect(

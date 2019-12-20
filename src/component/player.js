@@ -2,6 +2,7 @@ import React, { Component,Fragment } from 'react'
 import '../css/player.scss'
 import 'animate.css'
 import { connect } from 'react-redux'
+import {setMusicList,setShowPlayer,currentMusic} from '../store/action'
 import {formatTime} from '../common/utils'
 import ajax from '../api/ajax'
 class Player extends Component {
@@ -21,7 +22,10 @@ class Player extends Component {
             songLyric:[], // 歌词
             currentIndex: 0,
             progress: null,
-            showLyric: false // 是否显示歌词
+            showLyric: false, // 是否显示歌词
+            LyricTop: 0,
+            showMusicList: false, // 是否显示歌单列表
+            musicListAni: true
         }
         this.musicPlayer = this.musicPlayer.bind(this)
         this.isPlayer = this.isPlayer.bind(this)
@@ -34,6 +38,10 @@ class Player extends Component {
         this.getSongLyric = this.getSongLyric.bind(this)
         this.getLyricTop = this.getLyricTop.bind(this)
         this.showLyric =  this.showLyric.bind(this)
+        this.musicShowList = this.musicShowList.bind(this)
+        this.musicHideAni = this.musicHideAni.bind(this)
+        this.deleteAll = this.deleteAll.bind(this)
+        this.playNow = this.playNow.bind(this)
     }
     componentDidMount(){
         this.refs.audio.addEventListener('canplay',this.isPlayer)
@@ -52,9 +60,19 @@ class Player extends Component {
         this.refs.progress.addEventListener('touchend',this.progressEnd)
     }
     UNSAFE_componentWillReceiveProps(newProps){
+        this.setState({
+            currentIndex: 0,
+            progressLine: 0
+        })
         const id = newProps.currentMusic.id
         this.getSongDetail(id)  // 获取歌曲详情
         this.getSongLyric(id) // 获取歌词
+    }
+    componentWillUnmount () {
+        // 卸载异步操作设置状态
+        this.setState = (state, callback) => {
+            return
+        }
     }
     render() { 
         return ( 
@@ -72,7 +90,7 @@ class Player extends Component {
                     </section>
                     <section className="small-player-icon">
                         <i ref="player" className={this.state.isPlay ? 'player-pause-icon' : 'player-icon'} onClick={this.musicPlayer}></i>
-                        <i className="player-list-icon"></i>
+                        <i className="player-list-icon" onClick={this.musicShowList}></i>
                     </section>
                 </section>
                 {this.state.showPlayer ? (<section 
@@ -84,7 +102,11 @@ class Player extends Component {
                         <i onClick={this.closePlayer}>&#xe649;</i>
                         <section className="player-musicname">
                             <h2>{this.props.currentMusic.name}</h2>
-                            <p>{this.props.currentMusic.artists[0].name}</p>
+                            <p>
+                                {`${this.props.currentMusic.artists.map(item => {
+                                    return item.name
+                                })}`}
+                            </p>
                         </section>
                     </section>
                     <section style={this.state.showLyric ? {opacity: '0',visibility: 'hidden'}: {opacity: '1',visibility: 'inherit'}} className={this.state.isPlay ? 'player-music-content play-animate' : 'player-music-content play-animate-pause'}>
@@ -99,14 +121,15 @@ class Player extends Component {
                         <section 
                             className="player-lyric-content"
                             style={{
-                                transform:`translateY(-${this.getLyricTop()}px)`
+                                transform:`translate3d(0,-${this.state.LyricTop}px,0) translateZ(0)`,
+                                WebkitTransform:`translate3d(0,-${this.state.LyricTop}px,0) translateZ(0)`
                             }}
                             ref="player_lyric"
                         >
-                            {this.state.songLyric.map(item=>{
+                            {this.state.songLyric.map((item,index)=>{
                                 return(
                                     <p 
-                                        key={item.time}
+                                        key={index}
                                         style={item.highlight ? {color: '#fff'} : {}}
                                     >
                                         {item.lyric}
@@ -127,10 +150,35 @@ class Player extends Component {
                         <i>&#xea73;</i>
                         <i className={this.state.isPlay ? 'player-pause-icon' : 'player-icon'} onClick={this.musicPlayer}></i>
                         <i>&#xea73;</i>
-                        <i>&#xe6c1;</i>
+                        <i onClick={this.musicShowList}>&#xe6c1;</i>
                     </section>
                 </section>) : ''}
                 <audio ref="audio" src={`https://music.163.com/song/media/outer/url?id=${this.props.currentMusic.id}.mp3`}></audio>
+                {this.state.showMusicList && <section onClick={this.musicHideAni} className={this.state.musicListAni ? 'music-list-box animated bounceInUp' : 'music-list-box animated bounceOutDown'}>
+                    <section className="music-list-content">
+                        <h5>歌曲数量({this.props.musicList.length}) <span onClick={this.deleteAll}>&#xe62b;</span></h5>
+                        <ul>
+                            {
+                                this.props.musicList.map((item,index) => {
+                                    return(
+                                        <li key={item.id}>
+                                            <section onClick={this.playNow.bind(this,index)} className={item.isPlay ? 'text-overflow player' : 'text-overflow'}>
+                                                <span>
+                                                    {item.name} -
+                                                    <em>{` ${item.ar.map(item => {
+                                                        return item.name
+                                                    })}`}</em>
+                                                </span>
+                                            </section>
+                                            <span className="music-delete" onClick={this.deleteMusic.bind(this,index)}>&#xe605;</span>
+                                        </li>
+                                    )
+                                })
+                            }
+                        </ul>
+                        <span className="close-music-list" onClick={this.musicHideAni}>关闭</span>
+                    </section>
+                </section>}
             </Fragment>
         )
     }
@@ -167,7 +215,9 @@ class Player extends Component {
             }
         }).catch((error)=>{
             alert('暂无版权,请购买支持正版^_^')
-            console.log(error)
+            this.setState({
+                isPlay: false
+            })
             return false
         })
         ajax.$Get(`/song/detail?ids=${id}`).then(res=>{
@@ -278,9 +328,10 @@ class Player extends Component {
                 currentTime: this.refs.audio.currentTime,
                 progressLine: this.state.progressWidth * (this.refs.audio.currentTime / this.refs.audio.duration),
                 songLyric:items
+            },()=>{
+                this.getLyricTop()
             })
         }catch(error){
-            console.debug(error)
         }
     }
     showMainPlayer(){
@@ -293,27 +344,92 @@ class Player extends Component {
         })
     }
     getLyricTop(){
+        let timer
+        if (timer) {
+            clearTimeout(timer)
+        }
+        timer = setTimeout(() => {
         try{
             const index = this.state.currentIndex
             const lyricEle = this.refs.player_lyric
             const boxTop = lyricEle.getBoundingClientRect()
             const eleTop = lyricEle.getElementsByTagName('p')[index].getBoundingClientRect()
-            return eleTop.top - eleTop.height - boxTop.top
+            this.setState({
+                LyricTop: eleTop.top - eleTop.height - boxTop.top
+            })
         }catch(error){
-            console.log(error)
         }
+        }, 300)
     }
     showLyric () {
         this.setState({
             showLyric: !this.state.showLyric
         })
     }
+    musicShowList () {
+        this.setState({
+            showMusicList: true,
+            musicListAni: true
+        })
+    }
+    musicHideAni () {
+        this.setState({
+            musicListAni: false
+        },()=>{
+            setTimeout(()=>{
+                this.setState({
+                    showMusicList: false
+                })
+            },500)
+        })
+    }
+    deleteMusic (index,e) {
+        e.stopPropagation() //阻止事件冒泡
+        let musiciList = this.props.musicList
+        musiciList.splice(index,1)
+        this.props.setMusicList(musiciList)
+    }
+    deleteAll(){
+        this.musicHideAni()
+        let arr = []
+        this.props.setMusicList(arr)
+        this.closePlayer()
+        setTimeout(()=>{
+            this.props.hidePlayer()
+        },800)
+        this.refs.audio.removeEventListener('timeupdate',this.timeupdate)
+    }
+    playNow(playIndex,e){
+        e.stopPropagation() //阻止事件冒泡
+        let playlist = this.props.musicList
+        playlist.tracks = playlist.map((item)=>{
+            item.isPlay = false
+            return item
+        })
+        playlist.tracks[playIndex].isPlay = true
+        this.props.setCurrentMusic(playlist.tracks[playIndex])
+        let arr=[...playlist.tracks]
+        this.props.setMusicList(arr)
+    }
 }
 const mapStateToProps = state => ({
     currentMusic: state.currentMusic,
-    isShowPlayer: state.isShowPlayer
+    isShowPlayer: state.isShowPlayer,
+    musicList: state.musicList
   })
- 
+ //映射dispatch到props上
+const mapDispatchToProps = dispatch => ({
+    setMusicList:list=>{
+        dispatch(setMusicList(list))
+    },
+    hidePlayer: () => {
+        dispatch(setShowPlayer(false))
+    },
+    setCurrentMusic:status=>{
+        dispatch(currentMusic(status))
+    }
+})
 export default connect(
-    mapStateToProps
+    mapStateToProps,
+    mapDispatchToProps
   )(Player);

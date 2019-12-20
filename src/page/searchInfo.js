@@ -43,7 +43,9 @@ class SearchInfo extends Component{
                             return(
                                 <li onClick={()=>{this.goToPlay(item)}} key={item.id}>
                                     <span>{item.name}</span>
-                                    <span>{`${item.artists[0].name}-${item.album.name}`}</span>
+                                    <span>{`${item.artists.map(item => {
+                                        return item.name
+                                    })}-${item.album.name}`}</span>
                                 </li>
                             )
                         })

@@ -85,6 +85,8 @@
         display: flex;
         align-items: center;
         border-bottom: 1px solid #bebebe;
+        position: relative;
+        z-index: 10000;
         i{
             font-family: 'iconfont';
             color: #fff;
@@ -123,7 +125,8 @@
         justify-content: center;
         align-items: center;
         overflow: hidden;
-        transition: all .3s ease-in-out;
+        transition: transform .1s ease-in-out;
+        -webkit-transition: -webkit-transform .1s ease-in-out;
         &::after{
            content: '';
            display: block;
@@ -255,16 +258,17 @@
         margin-top:.5rem;
         overflow: hidden;
         opacity: 0;
-        transition: all .3s ease-in-out;
         position: absolute;
         left: 0;
         top:1rem;
         .player-lyric-content{
             width: 100%;
             height: auto;
-            transition: transform .3s ease-in-out;
+            transition: transform .6s ease-out;
+            -webkit-transition: -webkit-transform .6s ease-out;
             margin-top: 2rem;
             p{
+                backface-visibility: hidden;
                 width: 100%;
                 box-sizing: border-box;
                 padding:0 5%;
@@ -275,6 +279,107 @@
                 color: #c3c3c3;
                 font-size: .28rem;
                 text-align: center;
+            }
+        }
+    }
+    &::before{
+        content: '';
+        position: absolute;
+        display: block;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: rgba(0,0,0,0.5);
+    }
+}
+.music-list-box{
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+    .music-list-content{
+        width: 100%;
+        height: 8rem;
+        position: absolute;
+        bottom:0;
+        left:0;
+        background-color: #fff;
+        border-top-left-radius: .15rem;
+        border-top-right-radius: .15rem;
+        h5{
+            font-size: .3rem;
+            height:1rem;
+            line-height: 1rem;
+            border-bottom: 1px solid #eee;
+            text-indent: .5rem;
+            position: relative;
+            span{
+                font-family: 'iconfont';
+                font-size: .4rem;
+                position: absolute;
+                right: .5rem;
+            }
+        }
+        .close-music-list{
+            width: 100%;
+            height: .8rem;
+            display: block;
+            font-size: .3rem;
+            line-height: .8rem;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+        ul{
+            height: 6rem;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            li{
+                &:last-child{
+                    &::before{
+                        display: none;
+                    }
+                }
+                font-size: .28rem;
+                width: 100%;
+                height: .9rem;
+                padding-left:.5rem;
+                line-height: .9rem;
+                position: relative;
+                box-sizing: border-box;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                &::before{
+                    height: 1px;
+                    width: 100%;
+                    content: '';
+                    background-color: #eee;
+                    position: absolute;
+                    left: .5rem;
+                    bottom: 0;
+                }
+                section{
+                    width: 80%;
+                    em{
+                        color: #999;
+                    }
+                }
+                .music-delete{
+                    font-family: 'iconfont';
+                    font-size: .4rem;
+                    margin-right: .5rem;
+                }
+                section.player{
+                    em{
+                        color: #d43c33; 
+                    }
+                    color: #d43c33;
+                }
             }
         }
     }

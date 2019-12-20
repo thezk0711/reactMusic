@@ -1,19 +1,20 @@
+.play-list-bg{
+    width: 100%;
+    max-width: 100%;
+    height: 50%;
+    filter: blur(20px);
+    transform: scale(1.5);
+    position: absolute;
+    top:0;
+    left: 0;
+    background-position:center -.5rem;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
 .play-list-box{
     flex: 1;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
-    .play-list-bg{
-        width: 100%;
-        height: 50%;
-        filter: blur(20px);
-        transform: scale(1.5);
-        position: absolute;
-        top:0;
-        left: 0;
-        background-position:center -.5rem;
-        background-repeat: no-repeat;
-        background-size: contain;
-    }
     .play-list-content{
         position: relative;
         z-index: 3;
@@ -93,7 +94,7 @@
         li{
             display: flex;
             align-items: center;
-            margin-bottom: .3rem;
+            margin-bottom: .4rem;
             .play-list-main-l{
                 font-size: .3rem;
                 color: #666;
@@ -106,10 +107,14 @@
                 flex-direction: column;
                 h6{
                     font-size: .35rem;
-                    margin-bottom: .15rem;
-                    width: 6rem;
+                    margin-bottom: .2rem;
+                    width: 5rem;
+                }
+                .player{
+                    color: #d43c33;
                 }
                 span{
+                    width: 6rem;
                     font-size: .28rem;
                     color: #666;
                 }

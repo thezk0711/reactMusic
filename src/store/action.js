@@ -12,7 +12,7 @@ export const currentMusic = (currentMusic)=>{
 export function setHeaderOptions(headerOptions) {
   return { type: ActionTypes.SET_HEADER_OPTIONS, headerOptions }
 }
-// 设置子页面标题
-export function setHeaderTitle(headerTitle) {
-  return { type: ActionTypes.SET_HEADER_TITLE, headerTitle }
+// 设置当前播放列表
+export function setMusicList(musicList) {
+  return { type: ActionTypes.SET_MUSIC_LIST, musicList }
 }
