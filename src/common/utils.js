@@ -20,27 +20,3 @@ export const formatTime =  time => {
 const toZero = num =>{
     return num < 10 ? `0${num}` : num
 }
-// 防抖函数
-export const debounce = function(func, delay) {
-    let timer
-    return function(...args) {
-      if (timer) {
-        clearTimeout(timer)
-      }
-      timer = setTimeout(() => {
-        func.apply(this, args)
-      }, delay)
-    }
-  }
-  
-  // 节流函数
-  export const throttle = function(func, delay) {
-    let now = Date.now()
-    return function(...args) {
-      const current = Date.now()
-      if (current - now >= delay) {
-        func.apply(this, args)
-        now = current
-      }
-    }
-  }

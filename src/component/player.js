@@ -2,7 +2,7 @@ import React, { Component,Fragment } from 'react'
 import '../css/player.scss'
 import 'animate.css'
 import { connect } from 'react-redux'
-import {setMusicList,setShowPlayer,currentMusic} from '../store/action'
+import {setMusicList,setShowPlayer,currentMusic,setHistoryMusicList} from '../store/action'
 import {formatTime} from '../common/utils'
 import ajax from '../api/ajax'
 class Player extends Component {
@@ -42,11 +42,14 @@ class Player extends Component {
         this.musicHideAni = this.musicHideAni.bind(this)
         this.deleteAll = this.deleteAll.bind(this)
         this.playNow = this.playNow.bind(this)
+        this.isPlayEnd = this.isPlayEnd.bind(this)
+        this.playerPrev = this.playerPrev.bind(this)
     }
     componentDidMount(){
         this.refs.audio.addEventListener('canplay',this.isPlayer)
         this.refs.audio.addEventListener('loadedmetadata',this.changeAudio) // 解决ios无法自动播放问题
         this.refs.audio.addEventListener('timeupdate',this.timeupdate) // 播放时间改变触发
+        this.refs.audio.addEventListener('ended',this.isPlayEnd)
         const id = this.props.currentMusic.id
         this.getSongDetail(id)  // 获取歌曲详情
         this.getSongLyric(id) // 获取歌词
@@ -62,7 +65,8 @@ class Player extends Component {
     UNSAFE_componentWillReceiveProps(newProps){
         this.setState({
             currentIndex: 0,
-            progressLine: 0
+            progressLine: 0,
+            LyricTop:0
         })
         const id = newProps.currentMusic.id
         this.getSongDetail(id)  // 获取歌曲详情
@@ -147,9 +151,9 @@ class Player extends Component {
                         <span>{formatTime(this.state.duration)}</span>
                     </section>
                     <section className="player-music-controll">
-                        <i>&#xea73;</i>
+                        <i onClick={this.playerPrev}>&#xea73;</i>
                         <i className={this.state.isPlay ? 'player-pause-icon' : 'player-icon'} onClick={this.musicPlayer}></i>
-                        <i>&#xea73;</i>
+                        <i onClick={this.isPlayEnd}>&#xea73;</i>
                         <i onClick={this.musicShowList}>&#xe6c1;</i>
                     </section>
                 </section>) : ''}
@@ -205,6 +209,19 @@ class Player extends Component {
         this.setState({
             isPlay: true,
             duration: this.refs.audio.duration
+        },()=>{
+            let musicList = [...this.props.historyMusicList]
+            let hasMusic = false
+            musicList.forEach(item=>{
+                if (item.id === this.props.currentMusic.id) {
+                    hasMusic = true
+                }
+            })
+            if(!hasMusic) {
+                musicList.unshift(this.props.currentMusic)
+            }
+            this.props.setHistoryMusicList(musicList)
+            console.log(this.props.historyMusicList)
         })
     }
     getSongDetail(id){
@@ -215,6 +232,7 @@ class Player extends Component {
             }
         }).catch((error)=>{
             alert('暂无版权,请购买支持正版^_^')
+            this.isPlayEnd()
             this.setState({
                 isPlay: false
             })
@@ -386,8 +404,15 @@ class Player extends Component {
     deleteMusic (index,e) {
         e.stopPropagation() //阻止事件冒泡
         let musiciList = this.props.musicList
-        musiciList.splice(index,1)
-        this.props.setMusicList(musiciList)
+        if (musiciList.length > 1) {
+            if (musiciList[index].isPlay) {
+                this.playNow(index+1)
+            }
+            musiciList.splice(index,1)
+            this.props.setMusicList(musiciList)
+        } else {
+            this.deleteAll()
+        }
     }
     deleteAll(){
         this.musicHideAni()
@@ -400,7 +425,7 @@ class Player extends Component {
         this.refs.audio.removeEventListener('timeupdate',this.timeupdate)
     }
     playNow(playIndex,e){
-        e.stopPropagation() //阻止事件冒泡
+        e && e.stopPropagation() //阻止事件冒泡
         let playlist = this.props.musicList
         playlist.tracks = playlist.map((item)=>{
             item.isPlay = false
@@ -411,11 +436,42 @@ class Player extends Component {
         let arr=[...playlist.tracks]
         this.props.setMusicList(arr)
     }
+    isPlayEnd () { // 播放下一首 列表循环
+        if (this.props.musicList.length>1) {
+            let playerIndex = 0
+            this.props.musicList.forEach((item,index)=>{
+                if(this.props.currentMusic.id === item.id) {
+                    if(index !== this.props.musicList.length-1) {
+                        playerIndex = index+1
+                    }
+                }
+            })
+            this.playNow(playerIndex)
+        } else {
+            this.refs.audio.load()
+        }
+    }
+    playerPrev () { //  播放上一首
+        if (this.props.musicList.length>1) {
+            let playerIndex = this.props.musicList.length-1
+            this.props.musicList.forEach((item,index)=>{
+                if(this.props.currentMusic.id === item.id) {
+                    if(index !== 0) {
+                        playerIndex = index-1
+                    }
+                }
+            })
+            this.playNow(playerIndex)
+        } else {
+            this.refs.audio.load()
+        }
+    }
 }
 const mapStateToProps = state => ({
     currentMusic: state.currentMusic,
     isShowPlayer: state.isShowPlayer,
-    musicList: state.musicList
+    musicList: state.musicList,
+    historyMusicList: state.historyMusicList
   })
  //映射dispatch到props上
 const mapDispatchToProps = dispatch => ({
@@ -427,6 +483,9 @@ const mapDispatchToProps = dispatch => ({
     },
     setCurrentMusic:status=>{
         dispatch(currentMusic(status))
+    },
+    setHistoryMusicList:list =>{
+        dispatch(setHistoryMusicList(list))
     }
 })
 export default connect(

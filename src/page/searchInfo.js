@@ -33,10 +33,10 @@ class SearchInfo extends Component{
     render(){
         return(
             <section className="search-info-box">
-                <ul className="search-info-titile">
+                {/* <ul className="search-info-titile">
                     <li className="active">单曲</li>
                     <li>歌单</li>
-                </ul>
+                </ul> */}
                 <ul className="search-info-musilist">
                     {
                         this.state.searchMuiscList.map((item,index)=>{

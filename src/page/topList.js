@@ -4,6 +4,7 @@ import {setHeaderOptions} from '../store/action'
 import Ajax from '../api/ajax'
 import ImgLoad from '../component/imgLoading'
 import '../css/top-list.scss'
+import { Link } from 'react-router-dom'
 class topList extends Component{
     constructor(props){
         super(props)
@@ -51,34 +52,38 @@ class topList extends Component{
                 {
                     this.state.officialList.map(item => {
                         return (
-                            <dl key={item.id} className="official-list">
-                                <dd date-update={item.updateFrequency}>
-                                    <ImgLoad imgSrc={item.coverImgUrl}/>
-                                </dd>
-                                <dt>
-                                    {item.tracks.map((tracksItem,index)=>{
-                                        return(
-                                    <p className="text-overflow" key={new Date().getTime()+index}>{`${index+1}.${tracksItem.first}`}-{tracksItem.second}</p>
-                                        )  
-                                    })}
-                                </dt>
-                            </dl>
+                            <Link to={{ pathname: `/playlist/${item.id}`, state:'排行榜'}}  key={item.id}>
+                                <dl className="official-list">
+                                    <dd date-update={item.updateFrequency}>
+                                        <ImgLoad imgSrc={item.coverImgUrl}/>
+                                    </dd>
+                                    <dt>
+                                        {item.tracks.map((tracksItem,index)=>{
+                                            return(
+                                        <p className="text-overflow" key={new Date().getTime()+index}>{`${index+1}.${tracksItem.first}`}-{tracksItem.second}</p>
+                                            )  
+                                        })}
+                                    </dt>
+                                </dl>
+                            </Link>
                         )
                     })
                 }
-                <h3>更多榜单</h3>
+                {this.state.moreList.length!== 0 && <h3>更多榜单</h3>}
                 <ul className="more-list">
                 {
                     this.state.moreList.map(item => {
                         return(
-                            <li key={item.id}>
-                                <span date-update={item.updateFrequency}>
-                                    <ImgLoad imgSrc={item.coverImgUrl}/>
-                                </span>
-                                <p>
-                                    {item.name}
-                                </p>
-                            </li>
+                            <Link to={{ pathname: `/playlist/${item.id}`, state:'排行榜'}} key={item.id}>
+                                <li key={item.id}>
+                                    <span date-update={item.updateFrequency}>
+                                        <ImgLoad imgSrc={item.coverImgUrl}/>
+                                    </span>
+                                    <p className="text-overflow">
+                                        {item.name}
+                                    </p>
+                                </li>
+                            </Link>
                         )
                     })
                 }

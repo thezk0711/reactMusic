@@ -8,6 +8,7 @@ const $Post = (url,params)=>{
             if(res.status === 200){
                 reslove(res.data)
             } else {
+                console.log(res)
                 reject(res)
             }
         }).catch((error)=>{

@@ -15,6 +15,7 @@ const HotSearch = lazy(() => import('./hotSearch'))
 const searchInfo = lazy(() => import('./searchInfo'))
 const topList = lazy(() => import('./topList'))
 const playList = lazy(() => import('./playList'))
+const musicRecord = lazy(() => import('./musicRecord'))
 class ReactRouter extends Component{
     render(){
         return(
@@ -27,6 +28,7 @@ class ReactRouter extends Component{
                         <Route path="/searchInfo" component={searchInfo} />
                         <Route path="/topList" component={topList} />
                         <Route path="/playList/:playId" component={playList} />
+                        <Route path="/musicRecord" component={musicRecord} />
                         <Redirect to="/music" />
                     </Switch>
                 </Suspense>

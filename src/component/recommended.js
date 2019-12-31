@@ -31,7 +31,7 @@ class Recommended extends Component{
                         this.state.recoList.map((item,index) => {
                             return(
                                 <li key={item.id}>
-                                    <Link to={`/playlist/${item.id}`} data-play-count={formatPlayerCount(item.playCount)} state={{needLogin: true}}>
+                                    <Link to={{ pathname: `/playlist/${item.id}`, state:'歌单'}} data-play-count={formatPlayerCount(item.playCount)} state={{needLogin: true}}>
                                         <ImgLoad imgSrc={item.picUrl}/>
                                         <h5>{item.name}</h5>
                                     </Link>  

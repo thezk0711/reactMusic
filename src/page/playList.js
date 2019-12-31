@@ -13,18 +13,20 @@ class PlayList extends Component{
         this.playNow = this.playNow.bind(this)
     }
     componentWillMount(){
+        let headerTitle = this.props.location.state
         this.props.setHeaderOptions({
             isShowHeader: true,
-            headerTitle: '歌单', 
+            headerTitle: headerTitle, 
             status: 0
         })
     }
     componentDidMount(){
+        let headerTitle = this.props.location.state
         const id = this.props.match.params.playId
         Ajax.$Get(`/playlist/detail?id=${id}`).then(res => {
             this.props.setHeaderOptions({
                 isShowHeader: true,
-                headerTitle: '歌单', 
+                headerTitle: headerTitle, 
                 status: 1
             })
             const playList = res.playlist.tracks.map(item=>{
@@ -46,7 +48,7 @@ class PlayList extends Component{
                     } else {
                         this.props.setHeaderOptions({
                             isShowHeader: true,
-                            headerTitle: '歌单', 
+                            headerTitle: headerTitle, 
                             status: 1
                         })
                     }
@@ -106,15 +108,20 @@ class PlayList extends Component{
                     </ul> 
                 </div>
             </div>
-            </Fragment> : <Fragment><div className="play-list-box"></div></Fragment>
+            </Fragment> : <Fragment><div className="play-list-box">
+                <div className="music-page-loading">
+                    拼命加载中...
+                </div>
+            </div>
+            </Fragment>
         )
     }
     playNow(playIndex){
         let playlist = this.state.playlist
-        playlist.tracks = playlist.tracks.map((item)=>{
+        playlist.tracks = [...playlist.tracks.map((item)=>{
             item.isPlay = false
             return item
-        })
+        })]
         playlist.tracks[playIndex].isPlay = true
         this.setState({
             playlist: playlist

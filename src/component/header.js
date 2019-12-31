@@ -68,7 +68,8 @@ class Header extends Component{
     }
     cancel (){ // 取消搜索
         this.setState({
-            isFocus: false
+            isFocus: false,
+            searchVal: ''
         })
         this.props.history.push('/music')
     }
